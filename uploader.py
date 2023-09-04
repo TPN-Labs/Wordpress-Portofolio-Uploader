@@ -1,5 +1,6 @@
 import time
 
+from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
@@ -54,24 +55,125 @@ class Uploader:
         title_box = self.driver.find_element(By.ID, 'title')
         title_box.send_keys(title)
 
-    def replace_post_content(self):
-        container_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[3]/div[1]/div[1]/div[2]/div/div[4]/div[2]/div[2]/div/div/div/div/div[2]/div[3]"
-        container = self.driver.find_element(By.XPATH, container_xpath)
-        self.actions.move_to_element(container).context_click().perform()
-        time.sleep(1)
+    def replace_post_content(self, title):
+        tries = 0
+        while (tries < 5):
+            try:
+                container_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[3]/div[1]/div[1]/div[2]/div/div[4]/div[2]/div[2]/div/div/div/div/div[2]/div[3]"
+                container = self.driver.find_element(By.XPATH, container_xpath)
+                self.actions.move_to_element(container).context_click().perform()
+                break
+            except:
+                time.sleep(3)
+                tries += 1
+                print("[UPLOADER] Could not find post container, retrying..")
 
         container_title_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[3]/div[1]/div[1]/div[2]/div/div[8]/ul/li[1]"
         container_title = self.driver.find_element(By.XPATH, container_title_xpath)
         container_title.click()
         time.sleep(1)
 
-        self.driver.switch_to.frame(0)
+        iframe = self.driver.find_element(By.ID, 'element_content_ifr')
+        self.driver.switch_to.frame(iframe)
 
         textarea_xpath = "/html/body/p"
         textarea = self.driver.find_element(By.XPATH, textarea_xpath)
-        textarea.send_keys("Hello world!")
+        textarea.send_keys(Keys.COMMAND + "A")
+        time.sleep(1)
+        textarea.send_keys(title)
 
         self.driver.switch_to.default_content()
+
+    def save_post_changes(self):
+        text_block_save_xpath = "/html/body/div[15]/div/div/div[2]/a[1]"
+        text_block_save_button = self.driver.find_element(By.XPATH, text_block_save_xpath)
+        text_block_save_button.click()
+
+    def replace_post_photo(self, name):
+        container_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[3]/div[1]/div[1]/div[2]/div/div[4]/div[3]/div[2]/div/div/div/div/div[2]/div[3]"
+        container = self.driver.find_element(By.XPATH, container_xpath)
+        self.actions.move_to_element(container).context_click().perform()
+        time.sleep(1)
+
+        container_edit_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[3]/div[1]/div[1]/div[2]/div/div[8]/ul/li[1]"
+        container_edit = self.driver.find_element(By.XPATH, container_edit_xpath)
+        container_edit.click()
+        time.sleep(1)
+
+        edit_photo_xpath = "/html/body/div[17]/div/div/div[3]/div/div[1]/ul/li[1]/div[2]/div/input[2]"
+        edit_photo = self.driver.find_element(By.XPATH, edit_photo_xpath)
+        edit_photo.click()
+        time.sleep(1)
+
+        search_asset_xpath = "/html/body/div[18]/div[1]/div/div/div[3]/div[2]/div/div[1]/div[2]/input"
+        search_asset = self.driver.find_element(By.XPATH, search_asset_xpath)
+        search_asset.send_keys(name)
+        time.sleep(3)
+
+        search_tries = 0
+        while (search_tries < 5):
+            try:
+                photo_result_xpath = "/html/body/div[18]/div[1]/div/div/div[3]/div[2]/div/div[3]/ul/li[1]/div/div"
+                photo_result = self.driver.find_element(By.XPATH, photo_result_xpath)
+                photo_result.click()
+                break
+            except Exception as error:
+                time.sleep(3)
+                search_tries += 1
+                print("[UPLOADER] Could not find result, retrying..")
+
+        insert_button_xpath = "/html/body/div[18]/div[1]/div/div/div[4]/div/div[2]/button"
+        insert_button = self.driver.find_element(By.XPATH, insert_button_xpath)
+        insert_button.click()
+        time.sleep(3)
+
+        save_button_xpath = "/html/body/div[17]/div/div/div[2]/a[1]"
+        save_button = self.driver.find_element(By.XPATH, save_button_xpath)
+        save_button.click()
+        time.sleep(3)
+
+    def publish_post(self):
+        publish_button_xpath = "/html/body/div[1]/div[4]/a[3]"
+        publish_button = self.driver.find_element(By.XPATH, publish_button_xpath)
+        publish_button.click()
+        time.sleep(1)
+
+    def select_post_category(self, category):
+        if category == 'paintings-transitions':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[13]"
+        elif category == 'paintings-junkyard-symphony':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[10]"
+        category_option = self.driver.find_element(By.XPATH, category_xpath)
+        category_option.click()
+
+    def replace_thumbnail(self, name):
+        set_thumbnail_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[9]/div[2]/p/a"
+        set_thumbnail_button = self.driver.find_element(By.XPATH, set_thumbnail_xpath)
+        set_thumbnail_button.click()
+        time.sleep(1)
+
+        search_asset_xpath = "/html/body/div[15]/div[1]/div/div/div[3]/div[2]/div/div[1]/div[2]/input"
+        search_asset = self.driver.find_element(By.XPATH, search_asset_xpath)
+        search_asset.send_keys(name)
+        time.sleep(3)
+
+        search_tries = 0
+        while (search_tries < 5):
+            try:
+                photo_result_xpath = "/html/body/div[15]/div[1]/div/div/div[3]/div[2]/div/div[3]/ul/li[1]/div/div"
+                photo_result = self.driver.find_element(By.XPATH, photo_result_xpath)
+                photo_result.click()
+                break
+            except Exception as error:
+                time.sleep(3)
+                search_tries += 1
+                print("[UPLOADER] Could not find result, retrying..")
+
+        set_image_button_xpath = "/html/body/div[15]/div[1]/div/div/div[4]/div/div[2]/button"
+        set_image_button = self.driver.find_element(By.XPATH, set_image_button_xpath)
+        set_image_button.click()
+        time.sleep(3)
+
 
     def upload_photo(self, photo):
         self.driver.get(WP_PORTFOLIO_DOMAIN)
@@ -79,5 +181,12 @@ class Uploader:
         self.replace_post_title(photo.title)
         time.sleep(2)
 
-        self.replace_post_content()
-        time.sleep(10)
+        self.replace_post_content(photo.title)
+        self.save_post_changes()
+        self.select_post_category(photo.category)
+        self.replace_thumbnail(photo.file_name)
+
+        self.replace_post_photo(photo.file_name)
+        self.publish_post()
+        print("[UPLOADER] Photo uploaded successfully, continue..")
+        time.sleep(1)

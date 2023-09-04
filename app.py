@@ -18,7 +18,8 @@ def read_photos():
             file_name = file.split('.')[0]
             photo_name = file_name.split(',')[0]
             photo_category = 'paintings-' + directory.replace(' ', '-').lower()
-            photo = PhotoDetails(photo_name, photo_category, file_name)
+            photo_path = os.path.abspath('./assets/' + directory + '/' + file)
+            photo = PhotoDetails(photo_name, photo_category, file_name, photo_path)
             all_photos.append(photo)
 
     return all_photos
@@ -30,7 +31,7 @@ def main():
     try:
         uploader = Uploader(WP_USERNAME, WP_PASSWORD, get_browser())
         uploader.login_to_wordpress()
-        for idx in range(0, 1):
+        for idx in range(0, len(all_photos)):
             current_photo = all_photos[idx]
             print("[UPLOADER] Uploading photo [" + str(idx + 1) + "/" + str(len(all_photos)) + "]: " + current_photo.title)
             uploader.upload_photo(current_photo)
