@@ -1,10 +1,12 @@
 import time
+import os
 
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
 from auth import WP_DOMAIN, WP_PORTFOLIO_DOMAIN
+from modal import select_photo_from_options
 
 
 class Uploader:
@@ -111,16 +113,25 @@ class Uploader:
         time.sleep(3)
 
         search_tries = 0
-        while (search_tries < 5):
+        photo_is_found = False
+        while search_tries < 5 and not photo_is_found:
             try:
-                photo_result_xpath = "/html/body/div[18]/div[1]/div/div/div[3]/div[2]/div/div[3]/ul/li[1]/div/div"
-                photo_result = self.driver.find_element(By.XPATH, photo_result_xpath)
-                photo_result.click()
-                break
+                photo_results_xpath = "/html/body/div[18]/div[1]/div/div/div[3]/div[2]/div/div[3]/ul"
+                photo_results = self.driver.find_element(By.XPATH, photo_results_xpath).find_elements(By.TAG_NAME, 'li')
+
+                photo_is_found, photo_index = select_photo_from_options(photo_results, name)
+
+                if photo_is_found:
+                    photo_option_xpath = "/html/body/div[18]/div[1]/div/div/div[3]/div[2]/div/div[3]/ul/li[" + str(photo_index) + "]/div/div"
+                    photo_option = self.driver.find_element(By.XPATH, photo_option_xpath)
+                    photo_option.click()
+
+                search_tries += 1
             except Exception as error:
                 time.sleep(3)
                 search_tries += 1
                 print("[UPLOADER] Could not find result, retrying..")
+                print(error)
 
         insert_button_xpath = "/html/body/div[18]/div[1]/div/div/div[4]/div/div[2]/button"
         insert_button = self.driver.find_element(By.XPATH, insert_button_xpath)
@@ -138,11 +149,41 @@ class Uploader:
         publish_button.click()
         time.sleep(1)
 
+
+    def delete_file(self, photo_path):
+        os.remove(photo_path)
+
+
     def select_post_category(self, category):
         if category == 'paintings-transitions':
             category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[13]"
         elif category == 'paintings-junkyard-symphony':
             category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[10]"
+        elif category == 'paintings-personal-mythologies':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[1]/ul/li[8]"
+        elif category == 'paintings-memories-of-the-future':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[1]/ul/li[4]"
+        elif category == 'paintings-playing-war':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[1]/ul/li[5]"
+        elif category == 'paintings-the-ordinary-and-the-divine':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[1]/ul/li[7]"
+        elif category == 'paintings-synthetic-future':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[1]/ul/li[6]"
+        elif category == 'paintings-hybrid-playground':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[1]/ul/li[2]"
+        elif category == 'paintings-heaven-and-earth':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[1]/ul/li[1]"
+        elif category == 'digital-art-cosmic-junk':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[1]"
+        elif category == 'drawings-junkyard':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[5]"
+        elif category == 'drawings-meet-me':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[6]"
+        elif category == 'drawings-playground':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[7]"
+        elif category == 'drawings-synthetic':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[8]"
+
         category_option = self.driver.find_element(By.XPATH, category_xpath)
         category_option.click()
 
@@ -158,16 +199,25 @@ class Uploader:
         time.sleep(3)
 
         search_tries = 0
-        while (search_tries < 5):
+        photo_is_found = False
+        while search_tries < 5 and not photo_is_found:
             try:
-                photo_result_xpath = "/html/body/div[15]/div[1]/div/div/div[3]/div[2]/div/div[3]/ul/li[1]/div/div"
-                photo_result = self.driver.find_element(By.XPATH, photo_result_xpath)
-                photo_result.click()
-                break
+                photo_results_xpath = "/html/body/div[15]/div[1]/div/div/div[3]/div[2]/div/div[3]/ul"
+                photo_results = self.driver.find_element(By.XPATH, photo_results_xpath).find_elements(By.TAG_NAME, 'li')
+
+                photo_is_found, photo_index = select_photo_from_options(photo_results, name)
+
+                if photo_is_found:
+                    photo_option_xpath = "/html/body/div[15]/div[1]/div/div/div[3]/div[2]/div/div[3]/ul/li[" + str(photo_index) + "]/div/div"
+                    photo_option = self.driver.find_element(By.XPATH, photo_option_xpath)
+                    photo_option.click()
+
+                search_tries += 1
             except Exception as error:
                 time.sleep(3)
                 search_tries += 1
                 print("[UPLOADER] Could not find result, retrying..")
+                print(error)
 
         set_image_button_xpath = "/html/body/div[15]/div[1]/div/div/div[4]/div/div[2]/button"
         set_image_button = self.driver.find_element(By.XPATH, set_image_button_xpath)
@@ -188,5 +238,6 @@ class Uploader:
 
         self.replace_post_photo(photo.file_name)
         self.publish_post()
-        print("[UPLOADER] Photo uploaded successfully, continue..")
+        print("[UPLOADER] Photo uploaded successfully, deleting..")
+        self.delete_file(photo.path)
         time.sleep(1)
