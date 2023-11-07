@@ -4,7 +4,6 @@ import os
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-from difflib import SequenceMatcher
 
 from auth import WP_DOMAIN, WP_PORTFOLIO_DOMAIN
 from modal import select_photo_from_options
@@ -174,10 +173,14 @@ class Uploader:
             category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[1]/ul/li[1]"
         elif category == 'digital-art-cosmic-junk':
             category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[1]"
+        elif category == 'drawings-junkyard':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[5]"
         elif category == 'drawings-meet-me':
             category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[6]"
         elif category == 'drawings-playground':
             category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[7]"
+        elif category == 'drawings-synthetic':
+            category_xpath = "/html/body/div[1]/div[2]/div[2]/div[1]/div[3]/form/div/div/div[2]/div/div[4]/div[2]/div/div[2]/ul/li[8]"
 
         category_option = self.driver.find_element(By.XPATH, category_xpath)
         category_option.click()
