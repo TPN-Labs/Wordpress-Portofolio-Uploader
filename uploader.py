@@ -149,8 +149,10 @@ class Uploader:
         publish_button.click()
         time.sleep(1)
 
+
     def delete_file(self, photo_path):
         os.remove(photo_path)
+
 
     def select_post_category(self, category):
         if category == 'paintings-transitions':
@@ -221,6 +223,7 @@ class Uploader:
         set_image_button = self.driver.find_element(By.XPATH, set_image_button_xpath)
         set_image_button.click()
         time.sleep(3)
+
 
     def upload_photo(self, photo):
         self.driver.get(WP_PORTFOLIO_DOMAIN)
